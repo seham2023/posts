@@ -6,6 +6,7 @@ use App\helper\UploadHelper;
 use App\Models\Comment;
 use App\Models\image;
 use App\Models\Post;
+use Exception;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -20,7 +21,7 @@ class PostController extends Controller
         $posts=Post::with('comments')->get();
         $comments=Comment::with('replies')->get();
 
-        return view('front.comments',compact('posts','comments'));
+        return view('front.allPosts',compact('posts','comments'));
     }
 
     /**
@@ -30,7 +31,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('front.createPost');
     }
 
     /**
@@ -41,12 +42,55 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-      $newpost=  Post::create($request->except('image'));
-        if($request->has('images')){
+
+        try{
+
+            $newpost=  Post::create($request->except('images'));
+            if($request->has('images')){
+                if(count($request->images)>0){
+                    $images=UploadHelper::Up($request->images,'posts');
+                    $newpost->update(['image'=>$images[0]]);
+
+                    if (count($images) > 1) {
+                        foreach ($images as $key => $img) {
+                            image::create([
+                                'filename' => $img,
+                                'imageable_id' => $newpost->id,
+                                'imageable_type' => Post::class
+                            ]);
+                        }
+                    }
+                }
+
+            }
+
+            return redirect()->back();
+
+        }
+
+        catch(Exception $e){ return redirect()->back()->with('error','an error occured '. $e->getMessage());
+
+
+
+        }
+
+
+
+    }
+
+
+    public function update(Request $request, $id)
+    {
+
+        $newpost = Post::find($request->id);
+        $newpost->update($request->except('images'));
+
+        if ($request->hasFile('images')) {
+
+            $newpost->images()->delete();
             if(count($request->images)>0){
                 $images=UploadHelper::Up($request->images,'posts');
                 $newpost->update(['image'=>$images[0]]);
-
 
                 if (count($images) > 1) {
                     foreach ($images as $key => $img) {
@@ -58,52 +102,25 @@ class PostController extends Controller
                     }
                 }
             }
+          }
+
+          return redirect()->back();
 
         }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $post = Post::findorfail($request->id);
+
+
+        $post->delete();
+
+        return redirect()->back();
+
     }
 }

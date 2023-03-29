@@ -21,4 +21,9 @@ class Comment extends Model
         return $this->hasMany(Comment::class, 'parent_id');
     }
 
+    public function images(){
+        return $this->morphMany(image::class,'imageable');
+    }
+
+
 }

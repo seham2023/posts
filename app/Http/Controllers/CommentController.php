@@ -37,6 +37,8 @@ class CommentController extends Controller
     {
         // return $request;
         Comment::create($request->all());
+        return redirect()->back();
+
     }
 
     /**
@@ -68,9 +70,12 @@ class CommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Comment $comment)
     {
-        //
+        $comment->body = $request->input('body');
+        $comment->save();
+
+        return response()->json($comment);
     }
 
     /**
@@ -79,8 +84,9 @@ class CommentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, Comment $comment)
     {
-        //
+        $comment->delete();
+        return response()->json($comment);
     }
 }
