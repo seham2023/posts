@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-     
+
 
     public function show_login(){
 
@@ -31,5 +31,5 @@ class LoginController extends Controller
 
         return redirect()->to('login')->withErrors(trans('auth.failed'));
     }
- 
+
 }
