@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\helper\UploadHelper;
 use App\Models\User;
-use Illuminate\Auth\Authenticatable;
+use App\helper\UploadHelper;
 use Illuminate\Http\Request;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\RegisterRequest;
-
+use Illuminate\Contracts\Session\Session;
 
 class AuthController extends Controller
 {
@@ -41,5 +42,13 @@ class AuthController extends Controller
 
     }
 
+  public function logout(Request $request){
 
+    Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login');
+
+  }
  }

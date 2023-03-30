@@ -11,15 +11,13 @@
 </head>
 
 <body>
-    <div class="container">
-        <div class="row">
-          <div class="col-md-6 offset-md-3">
-            <br>
-            {{-- <h2>Create a Post</h2> --}}
-            <a href="{{ route('posts.create') }}" class="btn btn-primary">Create Post</a>
-          </div>
-        </div>
-      </div>
+    <div class="col-md-6 offset-md-3 d-flex justify-content-between align-items-center">
+        <a href="{{ route('posts.create') }}" class="btn btn-primary">Create Post</a>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="btn btn-danger">Logout</button>
+        </form>
+    </div>
 
     <div class="container">
         <div class="row">
