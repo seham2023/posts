@@ -45,12 +45,12 @@
                             @csrf
 
                             <div class="form-group row">
-                                <label for="mobile" class="col-md-4 col-form-label text-md-right">Email or Mobile</label>
+                                <label for="username" class="col-md-4 col-form-label text-md-right">Email or username</label>
 
                                 <div class="col-md-6">
-                                    <input id="mobile" type="text" class="form-control @error('mobile') is-invalid @enderror" name="mobile" value="{{ old('mobile') }}" required autofocus>
+                                    <input id="username" type="text" class="form-control @error('username') is-invalid @enderror" name="username" value="{{ old('username') }}" required autofocus>
 
-                                    @error('mobile')
+                                    @error('username')
                                         <span class="invalid-feedback" role="alert">
                                             <strong>{{ $message }}</strong>
                                         </span>

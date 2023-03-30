@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\RegisterRequest;
+
 
 class AuthController extends Controller
 {
@@ -21,41 +23,23 @@ class AuthController extends Controller
     }
 
 
-    public function register(Request $request ){
+    public function register(RegisterRequest $request ){
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'mobile' => 'required|numeric|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-            $newuser=User::create([
-                'name'=>$request->name,
-                'email'=>$request->email,
-                'mobile'=>$request->mobile,
-                'password'=>Hash::make($request->password)
-            ]);
+        $validated = $request->validated();
+
 
             if($request->hasFile('image')){
-            $img=UploadHelper::SingleUpload($request->image,'profile');
-            $newuser->update(['image'=>$img]);
+
+
+            $validated['image']=UploadHelper::SingleUpload($request->image,'profile');;
             }
+
+
+            User::create($validated);
 
         return redirect('/login')->with('success','User created successfully');
 
     }
-
-
-    public function show_login(){
-
-        return view('auth.login');
-
-    }
-
-
-
-
 
 
  }

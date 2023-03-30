@@ -25,49 +25,32 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'mobile' => 'required',
+            'username' => 'required|exists:users,' . $this->username(),
             'password' => 'required'
         ];
     }
 
-    /**
-     * Get the needed authorization credentials from the request.
+        /**
+     * Prepare the data for validation.
      *
-     * @return array
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return string
      */
-    public function getCredentials()
+    public function username(): string
     {
-        // The form field for providing username or password
-        // have name of "username", however, in order to support
-        // logging users in with both (username and email)
-        // we have to check if user has entered one or another
-        $username = $this->get('username');
-
-        if ($this->isEmail($username)) {
-            return [
-                'email' => $username,
-                'password' => $this->get('password')
-            ];
-        }
-
-        return $this->only('mobile', 'password');
+        return (filter_var(request()['username'], FILTER_VALIDATE_EMAIL)) ? 'email' : 'mobile';
     }
 
     /**
-     * Validate if provided parameter is valid email.
+     * Prepare the data for validation.
      *
-     * @param $param
-     * @return bool
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return void
      */
-    private function isEmail($param)
+    protected function prepareForValidation()
     {
-        $factory = $this->container->make(ValidationFactory::class);
 
-        return ! $factory->make(
-            ['username' => $param],
-            ['username' => 'email']
-        )->fails();
+        $this->merge([
+            'username_type' => $this->username(),
+        ]);
     }
+
 }
